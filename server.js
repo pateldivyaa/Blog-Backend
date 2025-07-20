@@ -4,6 +4,8 @@ const app = express()
 const port = 3000
 
 const mongoose = require('./db') 
+console.log("Testing Git change");
+
 
 // CORS configuration - Updated to include your frontend origin
 app.use(cors({
