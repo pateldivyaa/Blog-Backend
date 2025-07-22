@@ -1,29 +1,31 @@
-const express = require('express')
-const cors = require('cors')
-const app = express()
-const port = 3000
+const express = require('express');
+const app = express();
 
-const mongoose = require('./db') 
-console.log("Testing Git change");
+console.log('🔍 Testing minimal server setup...');
 
+try {
+  // Test 1: Basic Express setup
+  app.use(express.json());
+  console.log('✅ Express JSON middleware OK');
 
-// CORS configuration - Updated to include your frontend origin
-app.use(cors({
-   origin: [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'https://blog-frontend-admin-hss7.vercel.app/'  // Replace with actual Vercel frontend URL
-],
+  // Test 2: Your router (comment this out first to test)
+  // const router = require('./router');
+  // app.use('/api', router);
+  // console.log('✅ Router loaded OK');
 
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}))
+  // Test 3: Basic route
+  app.get('/', (req, res) => {
+    res.json({ message: 'Server is working' });
+  });
+  console.log('✅ Basic route OK');
 
-app.use(express.json()) 
-app.use(express.urlencoded({ extended: true }))  
-const router = require('./Routes/router')
-app.use('/', router)
+  const PORT = 3001;
+  app.listen(PORT, () => {
+    console.log(`✅ Test server running on port ${PORT}`);
+    console.log('If this works, the issue is in your router or how it\'s used');
+  });
 
-app.get('/', (req, res) => res.send('Hello World!'))
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+} catch (error) {
+  console.error('❌ Error in test server:', error.message);
+  console.error(error.stack);
+}

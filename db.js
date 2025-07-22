@@ -1,10 +1,15 @@
-const mongoose = require('mongoose');
+// test-db.js
 require('dotenv').config();
+const mongoose = require('mongoose');
 
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/blog-db';
+const uri = "mongodb+srv://spiritual_user:spiritual%40123@cluster0.49wblvc.mongodb.net/admin-panel?retryWrites=true&w=majority&appName=Cluster0";
 
-mongoose.connect(mongoURI)
-  .then(() => console.log('MongoDB connected!'))
-  .catch(err => console.error('Connection error:', err));
-
-module.exports = mongoose;
+mongoose.connect(uri)
+  .then(() => {
+    console.log('✅ MongoDB connection test successful!');
+    process.exit(0);
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection test failed:', err);
+    process.exit(1);
+  });
