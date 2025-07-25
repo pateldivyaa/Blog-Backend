@@ -1,37 +1,52 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+const jwtAuthMiddleware = require('../Middleware/jwtAuthMiddleware');
+const upload = require('../Middleware/upload');
+
+// Import your existing controllers
+const AuthorController = require('../Controller/AuthorController');
+const BlogController = require('../Controller/BlogController');
+
 const router = express.Router();
 
-console.log('🔍 Testing router definitions...');
+console.log('✅ Router loaded');
 
-try {
-  // Test each route one by one
-  console.log('Defining route: POST /authors');
-  router.post('/authors', (req, res) => res.json({message: 'createAuthor'}));
-  
-  console.log('Defining route: GET /authors');
-  router.get('/authors', (req, res) => res.json({message: 'getAuthors'}));
-  
-  console.log('Defining route: GET /blogs');
-  router.get('/blogs', (req, res) => res.json({message: 'getBlogs'}));
-  
-  console.log('Defining route: POST /admin/login');
-  router.post('/admin/login', (req, res) => res.json({message: 'adminLogin'}));
-  
-  // Test the problematic routes (with parameters)
-  console.log('Defining route: POST /blogs');
-  router.post('/blogs', (req, res) => res.json({message: 'createBlog'}));
-  
-  console.log('Defining route: PUT /blogs/:id');
-  router.put('/blogs/:id', (req, res) => res.json({message: 'updateBlog', id: req.params.id}));
-  
-  console.log('Defining route: DELETE /blogs/:id');
-  router.delete('/blogs/:id', (req, res) => res.json({message: 'deleteBlog', id: req.params.id}));
-  
-  console.log('✅ All router definitions successful!');
-  
-} catch (error) {
-  console.error('❌ Error in router definition:', error.message);
-  console.error('The error occurred at the last route being defined');
-}
+// Test route
+router.get('/test', (req, res) => {
+  res.json({ message: 'API is working!', timestamp: new Date() });
+});
+
+// Admin login
+router.post('/admin/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      const token = jwt.sign(
+        { email, role: 'admin' },
+        process.env.JWT_SECRET || 'secret123',
+        { expiresIn: '24h' }
+      );
+      
+      res.json({ success: true, token });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+// Author routes
+router.post('/authors', jwtAuthMiddleware, AuthorController.createAuthor);
+router.get('/authors', AuthorController.getAuthors);
+
+// Blog routes
+router.post('/blogs', jwtAuthMiddleware, upload.single('image'), BlogController.createBlog);
+router.get('/blogs', BlogController.getBlogs);
+router.put('/blogs/:id', jwtAuthMiddleware, upload.single('image'), BlogController.updateBlog);
+router.delete('/blogs/:id', jwtAuthMiddleware, BlogController.deleteBlog);
+
+console.log('✅ All routes defined');
 
 module.exports = router;

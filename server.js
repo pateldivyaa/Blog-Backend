@@ -1,31 +1,34 @@
 const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+require('dotenv').config();
+
 const app = express();
 
-console.log('🔍 Testing minimal server setup...');
+console.log('🚀 Starting server...');
 
-try {
-  // Test 1: Basic Express setup
-  app.use(express.json());
-  console.log('✅ Express JSON middleware OK');
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
-  // Test 2: Your router (comment this out first to test)
-  // const router = require('./router');
-  // app.use('/api', router);
-  // console.log('✅ Router loaded OK');
+// Database connection
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB error:', err));
 
-  // Test 3: Basic route
-  app.get('/', (req, res) => {
-    res.json({ message: 'Server is working' });
-  });
-  console.log('✅ Basic route OK');
+// Import and use your existing router
+const router = require('./Routes/router');
+app.use('/api', router);
 
-  const PORT = 3001;
-  app.listen(PORT, () => {
-    console.log(`✅ Test server running on port ${PORT}`);
-    console.log('If this works, the issue is in your router or how it\'s used');
-  });
+// Basic route
+app.get('/', (req, res) => {
+  res.json({ message: 'Blog Backend API is running!' });
+});
 
-} catch (error) {
-  console.error('❌ Error in test server:', error.message);
-  console.error(error.stack);
-}
+// Use environment PORT or 3000
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
