@@ -119,9 +119,7 @@ app.use('*', (req, res) => {
 
 // Use environment PORT or 3000
 const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
+// આ line change કરો:
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🌐 CORS enabled for: https://blog-frontend-admin-hss7.vercel.app`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
 });
