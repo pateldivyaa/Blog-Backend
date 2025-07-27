@@ -3,7 +3,6 @@ const Author = require('../Modal/AuthorSchema');
 exports.createAuthor = async (req, res) => {
     try {
         const author = new Author(req.body);
-        
         await author.save();
         res.status(201).json(author);
     } catch (error) {
